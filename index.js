@@ -2,7 +2,7 @@
 const express = require('express');
 // const {clients} = require('./server');
 const app = express();
-const {start,dataChangeEvent} = require('./datahandler')
+const {dataChangeEvent,currentData} = require('./datahandler')
 let counter = 0
 let clients = new Map;
 
@@ -19,27 +19,28 @@ app.use((req,res,next)=>{
 
 app.get('/',(req,res)=>{
     console.log('New User entered');
-    res.write('hello world');
+    write(res,currentData());
     req.clientId=counter;
     clients.set(req.clientId,res);
     counter++;
-    start(req,res);
 
     req.on('close',()=>{
         clients.delete(req.clientId);
         console.log(`client : ${req.clientId} is closed`);
     })
-
-//    res.send('You are at Homepage, go to logs to see details');
 })
 
-dataChangeEvent.on('data-changed',(data)=>{
+dataChangeEvent.on('data-changed',(logs)=>{
     clients.forEach((res)=>{
-        for(lines of data){
-    //        let curLine = lines.toString()+'\n';
-            res.write(lines.toString());
-        }
+        write(res,logs);
     });
 })
+
+function write(res,logs){
+    let currentLog = '';
+    for(log of logs)
+    currentLog+=(log+'\n');
+    res.write(currentLog);
+}
 
 module.exports = {app};

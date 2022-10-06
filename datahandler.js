@@ -29,7 +29,6 @@ function insertData(startAfter){
                     logs.dequeue();
                 logs.enqueue(element);
             });
-            console.log(logs.items);
             dataChangeEvent.emit('data-changed',logs.items);
         });
 
@@ -44,7 +43,11 @@ let start = ()=>{
     })
 }
 
-module.exports = {start,dataChangeEvent};
+let currentData = ()=>{
+    return logs.items;
+}
+
+module.exports = {start,dataChangeEvent,currentData};
 
 
 
